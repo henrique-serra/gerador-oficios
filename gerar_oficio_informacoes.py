@@ -3,8 +3,9 @@ import pandas as pd
 from docx import Document
 from docx.shared import Pt           # para fixar Calibri 12 pt
 
-TEMPLATE   = "modelo_oficio.docx"
-PLANILHA   = "dados_oficios.xlsx"
+# ALTERAR DE ACORDO COM A OCASIÃO
+TEMPLATE   = "modelo_oficio_informacoes.docx"
+PLANILHA   = "dados_oficios_informacoes.xlsx"
 PASTA_OUT  = "oficios_gerados"
 
 # --------------------------------------------------------------------------- #
@@ -12,9 +13,9 @@ PASTA_OUT  = "oficios_gerados"
 df = pd.read_excel(PLANILHA)
 
 # Numeração automática se a coluna "n" estiver vazia
-if df["n"].isna().all():
+if df["n_oficio"].isna().all():
     N0 = 1
-    df["n"] = range(N0, N0 + len(df))
+    df["n_oficio"] = range(N0, N0 + len(df))
 
 # Detectar se a coluna do mês tem acento ou não
 mes_col = "mês" if "mês" in df.columns else "mes"
@@ -89,9 +90,10 @@ for _, linha in df.iterrows():
 
     # Mapa de marcadores → valores
     mapa = {
-        "[n]":          int(linha["n"]),
-        "[dia]":        linha["dia"],
-        "[mês]":        linha[mes_col],
+        "[n_oficio]": int(linha["n_oficio"]),
+        "[dia_oficio]": linha["dia_oficio"],
+        "[mes_oficio]": linha["mes_oficio"],
+        "[ano_oficio]": linha["ano_oficio"],
         "[Tratamento]": trat,
         "[Pronome]":    pron,
         "[objPron]":    obj_pronome(linha["sexo"]),
@@ -101,6 +103,13 @@ for _, linha in df.iterrows():
         "[entidade]":   linha["entidade"],
         # "[entidade_abreviado]": linha["entidade_abreviado"],
         "[entidadePreposicao]": linha["entidadePreposicao"],
+        "[n_reuniao]": linha["n_reuniao"],
+        "[extraordinaria]": linha["extraordinaria"],
+        "[data_reuniao]": linha["data_reuniao"],
+        "[req_num]": linha["req_num"],
+        "[req_ano]": linha["req_ano"],
+        "[por_parte]": linha["por_parte"],
+        "[presidente_comissao]": "Senador Marcos Rogério"
     }
 
     # Substituição em parágrafos normais
@@ -113,7 +122,8 @@ for _, linha in df.iterrows():
 
     # Salvar
     primeiro_nome = linha["nome"].split()[0]
-    destino = f"{int(linha['n']):03d} - REQ 65 - {linha['entidade']}.docx"
+    # ALTERAR NOME PADRÃO DO DOCUMENTO DE ACORDO COM A REUNIÃO A SER REALIZADA
+    destino = f"{int(linha['n_oficio']):03d} - REQ {linha['req_num']} - {linha['entidade']}.docx"
     doc.save(os.path.join(PASTA_OUT, destino))
 
 print(f"{len(df)} ofício(s) gerado(s) em '{PASTA_OUT}'.")

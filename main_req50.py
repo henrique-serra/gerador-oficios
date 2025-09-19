@@ -3,8 +3,9 @@ import pandas as pd
 from docx import Document
 from docx.shared import Pt           # para fixar Calibri 12 pt
 
-TEMPLATE   = "modelo_oficio.docx"
-PLANILHA   = "dados_oficios.xlsx"
+# ALTERAR DE ACORDO COM A OCASIÃO
+TEMPLATE   = "modelo_oficio_req50.docx"
+PLANILHA   = "dados_oficios_req50.xlsx"
 PASTA_OUT  = "oficios_gerados"
 
 # --------------------------------------------------------------------------- #
@@ -86,6 +87,7 @@ for _, linha in df.iterrows():
 
     cargo_cap   = str(linha["cargo"]).lstrip()     # Maiúscula inicial
     cargo_upper = cargo_cap.upper()                # CAIXA ALTA
+    expositor = 'expositora' if linha['sexo'] == 'F' else 'expositor'
 
     # Mapa de marcadores → valores
     mapa = {
@@ -101,6 +103,13 @@ for _, linha in df.iterrows():
         "[entidade]":   linha["entidade"],
         # "[entidade_abreviado]": linha["entidade_abreviado"],
         "[entidadePreposicao]": linha["entidadePreposicao"],
+        "[expositor]": expositor,
+        # ALTERAR OS CAMPOS ABAIXO DE ACORDO COM A REUNIÃO A SER REALIZADA
+        "[objetivo]": "Discutir os efeitos do mecanismo de constraint-off no setor elétrico, com foco nos impactos contratuais, nos encargos tarifários e nas consequências para o consumidor brasileiro",
+        "[requerimentos]": "aos Requerimentos nº 50/2025-CI, 53/2025-CI, 54/2025-CI, 56/2025-CI e 57/2025-CI",
+        "[data_reuniao]": "23 de setembro de 2025, terça-feira",
+        "[horario_reuniao]": "09h00",
+        "[local_reuniao]": "no Plenário nº 13 da Ala Alexandre Costa, Anexo II, do Senado Federal"
     }
 
     # Substituição em parágrafos normais
@@ -113,7 +122,8 @@ for _, linha in df.iterrows():
 
     # Salvar
     primeiro_nome = linha["nome"].split()[0]
-    destino = f"{int(linha['n']):03d} - REQ 65 - {linha['entidade']}.docx"
+    # ALTERAR NOME PADRÃO DO DOCUMENTO DE ACORDO COM A REUNIÃO A SER REALIZADA
+    destino = f"{int(linha['n']):03d} - REQ 50 - {linha['entidade']}.docx"
     doc.save(os.path.join(PASTA_OUT, destino))
 
 print(f"{len(df)} ofício(s) gerado(s) em '{PASTA_OUT}'.")
